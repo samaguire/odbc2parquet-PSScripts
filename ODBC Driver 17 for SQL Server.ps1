@@ -1,11 +1,11 @@
 [CmdletBinding()]
 param (
     [Parameter()]
-    [string]$winX = "win64", # win64 or win32
+    [string]$winX = "win64", # win64 or win32 (version of odbc2parquet to use)
     [Parameter()]
     [string]$server = "localhost", # server\instance
     [Parameter()]
-    [string]$database = "ContosoRetailDW"
+    [string]$database = "ContosoRetailDW" # database
 )
 
 # Create sql connection and load the list of tables to a dataset
