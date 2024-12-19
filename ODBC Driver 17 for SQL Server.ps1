@@ -26,11 +26,22 @@ try {
     $connection.Open()
 
     $tableQuery = @"
-        SELECT s.name AS schemaName, t.name AS tableName 
-        FROM sys.tables t 
-        INNER JOIN sys.schemas s ON t.schema_id = s.schema_id 
-        WHERE t.name <> 'sysdiagrams' 
-        ORDER BY 1, 2
+SELECT 
+    s.name AS schema_name,
+    t.name AS table_name,
+    t.object_id,
+    t.create_date,
+    t.modify_date,
+    OBJECTPROPERTY(t.object_id, 'TableHasClustIndex') AS has_clustered_index,
+    OBJECTPROPERTY(t.object_id, 'TableHasPrimaryKey') AS has_primary_key
+FROM sys.tables t WITH (NOLOCK)
+    INNER JOIN sys.schemas s WITH (NOLOCK) ON t.schema_id = s.schema_id
+WHERE t.is_ms_shipped = 0  -- Excludes system tables
+    AND t.name NOT IN ('sysdiagrams', 'database_firewall_rules')
+    AND s.name NOT IN ('sys', 'INFORMATION_SCHEMA')
+ORDER BY 
+    s.name,
+    t.name;
 "@
     
     $sqlCommand = New-Object System.Data.SqlClient.SqlCommand($tableQuery, $connection)
